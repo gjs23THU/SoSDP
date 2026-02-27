@@ -1,0 +1,15 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.conda\\python.exe",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.profiles.windows": {
+    "PowerShell (.conda)": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "conda activate \"${workspaceFolder}\\.conda\""
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell (.conda)"
+}
