@@ -1,0 +1,28 @@
+.vscode/
+__pycache__/
+
+test_env.py
+check_env.py
+
+# Python bytecode / caches
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+
+# Python environments
+.conda/
+.venv/
+venv/
+env/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
