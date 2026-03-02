@@ -21,6 +21,7 @@ from torch.utils.data import DataLoader
 from model import DRL4SoS, Encoder
 
 import pandas as pd
+from tqdm.auto import tqdm
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #device = torch.device('cpu')
@@ -99,7 +100,7 @@ def validate(data_loader, actor, reward_fn, render_fn=None, save_dir='.',
         os.makedirs(save_dir)
 
     rewards = []
-    for batch_idx, batch in enumerate(data_loader):
+    for batch_idx, batch in enumerate(tqdm(data_loader, desc='Validate', leave=False)):
 
         static, dynamic, x0 = batch
 
@@ -157,7 +158,8 @@ def train(actor, critic, task, num_nodes, train_data, valid_data, reward_fn,
         if not os.path.exists(epoch_dir):
             os.makedirs(epoch_dir)
 
-        for batch_idx, batch in enumerate(train_loader):
+        train_iter = tqdm(train_loader, desc='Epoch %d/%d' % (epoch + 1, 5), leave=False)
+        for batch_idx, batch in enumerate(train_iter):
 
             static, dynamic, x0 = batch
 
@@ -193,6 +195,11 @@ def train(actor, critic, task, num_nodes, train_data, valid_data, reward_fn,
             # print(reward.detach().type,reward.detach().shape,reward.detach())
             rewards.append(torch.mean(reward.detach()).item())
             losses.append(torch.mean(actor_loss.detach()).item())
+
+            train_iter.set_postfix(
+                reward='%.3f' % rewards[-1],
+                loss='%.4f' % losses[-1]
+            )
 
             if (batch_idx + 1) % 100 == 0:
                 end = time.time()
@@ -336,7 +343,7 @@ def test(args):
     rewards=[]
     start=time.time()
     writer = pd.ExcelWriter('A.xlsx')
-    for batch_idx, batch in enumerate(train_loader):
+    for batch_idx, batch in enumerate(tqdm(train_loader, desc='Test', leave=False)):
             # start=time.time()
             static, dynamic, x0 = batch
 
@@ -357,7 +364,6 @@ def test(args):
             data.to_excel(writer, sheet_name='page_%d'%(batch_idx), float_format='%.5f')	# ‘page_1’是写入excel的sheet名
             # writer.save()
             # writer.close()
-    writer.save()
 
     writer.close()
     end=time.time()
@@ -392,8 +398,8 @@ if __name__ == '__main__':
     #args.checkpoint = os.path.join('vrp', '10', '12_59_47.350165' + os.path.sep)
     #print(args.checkpoint)
 
-    # if args.task == 'SoS':
-    #     train_SoS(args)
+    if args.task == 'SoS':
+        train_SoS(args)
     # elif args.task == 'vrp':
     #     train_vrp(args)
     # else:
@@ -401,6 +407,6 @@ if __name__ == '__main__':
 
 
      
-    test(args)
+    #test(args)
 
 
